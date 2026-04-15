@@ -1,0 +1,39 @@
+# Next.js build output
+.next/
+out/
+.build/
+
+# Dependency directories
+node_modules/
+
+# Vercel & framework files
+.vercel/
+next.user-config.*
+
+# Environment variables
+.env
+.env.*
+.env*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Misc
+*.log
+*.swp
+*.swo
