@@ -40,6 +40,14 @@ export function Header() {
               >
                 {user.type === 'admin' ? 'Admin Panel' : 'My Dashboard'}
               </Link>
+              {user.type === 'admin' && (
+                <Link
+                  href="/admin/remarks"
+                  className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors"
+                >
+                  Remarks
+                </Link>
+              )}
             </>
           )}
         </nav>

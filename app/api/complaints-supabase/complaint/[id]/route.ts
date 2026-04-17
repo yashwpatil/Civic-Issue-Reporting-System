@@ -7,11 +7,34 @@ type DepartmentCode = (typeof VALID_DEPARTMENTS)[number];
 
 async function findComplaintById(id: string) {
   for (const department of VALID_DEPARTMENTS) {
-    const complaint = await complaintDb.getComplaintById(id, department);
+    const complaint = await complaintDb.getComplaintByIdAdmin(id, department);
     if (complaint) {
-      return { complaint: { ...complaint, category: department }, department };
+      return {
+        complaint: { ...complaint, category: department },
+        department,
+        source: 'department' as const,
+      };
     }
   }
+
+  const legacyComplaint = await complaintDb.getLegacyComplaintByIdAdmin(id);
+  if (legacyComplaint) {
+    const legacyDepartment =
+      (VALID_DEPARTMENTS.includes(
+        legacyComplaint.assigned_department as DepartmentCode
+      )
+        ? legacyComplaint.assigned_department
+        : VALID_DEPARTMENTS.includes(legacyComplaint.category as DepartmentCode)
+          ? legacyComplaint.category
+          : 'garbage') as DepartmentCode;
+
+    return {
+      complaint: { ...legacyComplaint, category: legacyDepartment },
+      department: legacyDepartment,
+      source: 'legacy' as const,
+    };
+  }
+
   return null;
 }
 
@@ -56,11 +79,17 @@ export async function PATCH(
       return NextResponse.json({ error: 'Complaint not found' }, { status: 404 });
     }
 
-    const updatedComplaint = await complaintDb.updateComplaintStatus(
-      id,
-      result.department,
-      status as 'pending' | 'in-progress' | 'resolved'
-    );
+    const updatedComplaint =
+      result.source === 'legacy'
+        ? await complaintDb.updateLegacyComplaintStatusAdmin(
+            id,
+            status as 'pending' | 'in-progress' | 'resolved'
+          )
+        : await complaintDb.updateComplaintStatus(
+            id,
+            result.department,
+            status as 'pending' | 'in-progress' | 'resolved'
+          );
 
     return NextResponse.json(
       { ...updatedComplaint, category: result.department },
@@ -83,7 +112,11 @@ export async function DELETE(
       return NextResponse.json({ error: 'Complaint not found' }, { status: 404 });
     }
 
-    await complaintDb.deleteComplaint(id, result.department);
+    if (result.source === 'legacy') {
+      await complaintDb.deleteLegacyComplaintByIdAdmin(id);
+    } else {
+      await complaintDb.deleteComplaint(id, result.department);
+    }
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error('[Complaints-Supabase] DELETE error:', error);
