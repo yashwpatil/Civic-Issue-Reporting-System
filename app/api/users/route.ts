@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { NextResponse } from 'next/server';
+import { db } from '@/lib/db-supabase';
 
 export async function GET() {
   try {
-    const users = db.getAllUsers();
-    const stats = db.getUserStats();
+    const users = await db.users.getAllUsers();
+    const stats = await db.users.getUserStats();
 
     return NextResponse.json(
       { users, stats },

@@ -139,6 +139,18 @@ export default function LoginView() {
     setAdminCode('');
   };
 
+  const roleImageMap: Record<'user' | 'admin' | 'department', string> = {
+    user: '/login-user-illustration.jpg',
+    department: '/login-admin-illustration.jpg',
+    admin: '/login-admin-illustration.jpg',
+  };
+
+  const imageAltMap: Record<'user' | 'admin' | 'department', string> = {
+    user: 'Citizen reporting civic issue',
+    department: 'Department team reviewing issue dashboard',
+    admin: 'Admin managing civic issues and reports',
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted">
@@ -150,27 +162,16 @@ export default function LoginView() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted px-4 py-12">
       <div className="w-full max-w-4xl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          {/* Left side - Image with smooth transition */}
-          <div className="relative h-96 lg:h-full min-h-96 rounded-2xl overflow-hidden shadow-xl">
-            <div className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${role === 'user' ? 'opacity-100' : 'opacity-0'}`}>
-              <Image
-                src="/login-user-illustration.jpg"
-                alt="Citizen reporting civic issue"
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
-            <div className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${(role === 'admin' || role === 'department') ? 'opacity-100' : 'opacity-0'}`}>
-              <Image
-                src="/login-admin-illustration.jpg"
-                alt="Admin managing civic issues"
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-[520px_1fr] gap-8 items-center">
+          {/* Left side - Role-based image */}
+          <div className="relative w-full max-w-[520px] h-[520px] rounded-3xl overflow-hidden shadow-xl shadow-black/10">
+            <Image
+              src={roleImageMap[role]}
+              alt={imageAltMap[role]}
+              fill
+              className="object-cover"
+              priority
+            />
           </div>
 
           {/* Right side - Form */}
@@ -348,6 +349,50 @@ export default function LoginView() {
                       <p className="text-xs text-muted-foreground">Demo code: ADMIN2024</p>
                     </div>
                   )}
+
+                  {/* Hidden placeholder to maintain consistent form height */}
+                  {role !== 'admin' && (
+                    <div className="space-y-2 invisible">
+                      <label className="block text-sm font-medium text-foreground">
+                        Admin Code
+                      </label>
+                      <input
+                        type="password"
+                        placeholder="Enter admin code"
+                        className="w-full px-4 py-3 border border-input rounded-lg bg-background"
+                      />
+                      <p className="text-xs text-muted-foreground">Demo code: ADMIN2024</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Hidden placeholders for sign-up mode to maintain consistent height */}
+              {mode === 'signup' && (
+                <div className="space-y-3 invisible">
+                  <div className="flex gap-3 p-1 bg-muted rounded-lg">
+                    <button className="flex-1 py-2 px-3 rounded-md text-sm font-medium">
+                      Citizen
+                    </button>
+                    <button className="flex-1 py-2 px-3 rounded-md text-sm font-medium">
+                      Department
+                    </button>
+                    <button className="flex-1 py-2 px-3 rounded-md text-sm font-medium">
+                      Admin
+                    </button>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-foreground">
+                      Admin Code
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Enter admin code"
+                      className="w-full px-4 py-3 border border-input rounded-lg bg-background"
+                    />
+                    <p className="text-xs text-muted-foreground">Demo code: ADMIN2024</p>
+                  </div>
                 </div>
               )}
 

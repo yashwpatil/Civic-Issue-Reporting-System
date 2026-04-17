@@ -164,41 +164,41 @@ export function DashboardView() {
             </div>
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-3xl border border-white/10 bg-card/80 p-4">
-              <div className="flex items-center justify-between gap-4">
+          <div className="mt-6 grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
+            <div className="rounded-3xl border border-white/10 bg-card/80 p-4 h-full">
+              <div className="flex items-center justify-between gap-4 h-full">
                 <div>
                   <p className="text-sm text-foreground/70">Total complaints</p>
                   <p className="mt-3 text-3xl font-semibold text-foreground">{totalComplaints}</p>
                 </div>
-                <ListChecks className="h-6 w-6 text-primary" />
+                <ListChecks className="h-6 w-6 text-primary shrink-0" />
               </div>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-card/80 p-4">
-              <div className="flex items-center justify-between gap-4">
+            <div className="rounded-3xl border border-white/10 bg-card/80 p-4 h-full">
+              <div className="flex items-center justify-between gap-4 h-full">
                 <div>
                   <p className="text-sm text-foreground/70">Pending</p>
                   <p className="mt-3 text-3xl font-semibold text-foreground">{pendingCount}</p>
                 </div>
-                <AlertTriangle className="h-6 w-6 text-amber-500" />
+                <AlertTriangle className="h-6 w-6 text-amber-500 shrink-0" />
               </div>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-card/80 p-4">
-              <div className="flex items-center justify-between gap-4">
+            <div className="rounded-3xl border border-white/10 bg-card/80 p-4 h-full">
+              <div className="flex items-center justify-between gap-4 h-full">
                 <div>
                   <p className="text-sm text-foreground/70">In progress</p>
                   <p className="mt-3 text-3xl font-semibold text-foreground">{inProgressCount}</p>
                 </div>
-                <Clock3 className="h-6 w-6 text-sky-500" />
+                <Clock3 className="h-6 w-6 text-sky-500 shrink-0" />
               </div>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-card/80 p-4">
-              <div className="flex items-center justify-between gap-4">
+            <div className="rounded-3xl border border-white/10 bg-card/80 p-4 h-full">
+              <div className="flex items-center justify-between gap-4 h-full">
                 <div>
                   <p className="text-sm text-foreground/70">Resolved</p>
                   <p className="mt-3 text-3xl font-semibold text-foreground">{resolvedCount}</p>
                 </div>
-                <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+                <CheckCircle2 className="h-6 w-6 text-emerald-500 shrink-0" />
               </div>
             </div>
           </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Complaint } from '@/lib/db';
+import type { Complaint } from '@/lib/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -38,7 +38,7 @@ export function ComplaintCard({
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/complaints/${complaint.id}`, {
+      const response = await fetch(`/api/complaints-supabase/complaint/${complaint.id}`, {
         method: 'DELETE',
       });
 
@@ -74,6 +74,8 @@ export function ComplaintCard({
         return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
     }
   };
+
+  const audioUrl = complaint.audio_url || complaint.audio;
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
@@ -136,9 +138,9 @@ export function ComplaintCard({
               <span className="font-medium">Coordinates:</span> {complaint.latitude}, {complaint.longitude}
             </p>
           )}
-          {complaint.audio && (
+          {audioUrl && (
             <div className="mt-2 w-full overflow-hidden rounded-md border border-border">
-              <audio controls src={complaint.audio} className="w-full" />
+              <audio controls src={audioUrl} className="w-full" />
             </div>
           )}
         </div>

@@ -59,7 +59,7 @@ export function DepartmentSidebar({ departmentCode }: DepartmentSidebarProps) {
       <div className="mt-auto space-y-3">
         <Button
           variant="outline"
-          className="w-full justify-start text-foreground/80 hover:bg-white/5 hover:text-foreground"
+          className="w-full justify-start text-foreground/80 hover:bg-destructive hover:text-white hover:border-destructive transition-colors"
           onClick={handleLogout}
         >
           <LogOut className="h-4 w-4" />

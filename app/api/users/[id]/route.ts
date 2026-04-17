@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db } from '@/lib/db-supabase';
 
 export async function GET(
   request: NextRequest,
@@ -7,7 +7,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const user = db.getUserById(id);
+    const user = await db.users.getUserById(id);
 
     if (!user) {
       return NextResponse.json(
@@ -42,7 +42,7 @@ export async function PATCH(
       );
     }
 
-    const updatedUser = db.updateUser(id, body);
+    const updatedUser = await db.users.updateUser(id, body);
 
     if (!updatedUser) {
       return NextResponse.json(
@@ -70,14 +70,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const success = db.deleteUser(id);
-
-    if (!success) {
-      return NextResponse.json(
-        { message: 'User not found' },
-        { status: 404 }
-      );
-    }
+    await db.users.deleteUser(id);
 
     return NextResponse.json(
       { message: 'User deleted successfully' },

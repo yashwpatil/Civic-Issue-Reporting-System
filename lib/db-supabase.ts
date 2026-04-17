@@ -229,7 +229,11 @@ export const complaintDb = {
   async createComplaint(complaintData: Omit<Complaint, 'id' | 'created_at' | 'updated_at'>): Promise<Complaint> {
     const { data, error } = await supabase
       .from('complaints')
-      .insert([complaintData])
+      .insert([{
+        ...complaintData,
+        reported_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+      }])
       .select()
       .single();
 

@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db-supabase';
+import { complaintDb } from '@/lib/db-supabase-departments';
+
+const VALID_DEPARTMENTS = ['water', 'roads', 'electricity', 'garbage'] as const;
+
+type DepartmentCode = (typeof VALID_DEPARTMENTS)[number];
+
+function attachCategory(complaint: any, department: DepartmentCode) {
+  return {
+    ...complaint,
+    category: department,
+  };
+}
 
 /**
  * GET /api/complaints
@@ -9,16 +20,35 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
-    const department = searchParams.get('department');
+    const department = searchParams.get('department') as DepartmentCode | null;
 
-    let complaints;
+    let complaints: any[] = [];
 
     if (userId) {
-      complaints = await db.complaints.getComplaintsByUser(userId);
+      for (const departmentCode of VALID_DEPARTMENTS) {
+        const departmentComplaints = await complaintDb.getComplaintsByDepartment(departmentCode);
+        complaints.push(
+          ...departmentComplaints
+            .filter((c) => c.user_id === userId)
+            .map((complaint) => attachCategory(complaint, departmentCode))
+        );
+      }
     } else if (department) {
-      complaints = await db.complaints.getComplaintsByDepartment(department);
+      if (!VALID_DEPARTMENTS.includes(department)) {
+        return NextResponse.json(
+          { message: `Invalid department. Must be: ${VALID_DEPARTMENTS.join(', ')}` },
+          { status: 400 }
+        );
+      }
+      const departmentComplaints = await complaintDb.getComplaintsByDepartment(department);
+      complaints = departmentComplaints.map((complaint) => attachCategory(complaint, department));
     } else {
-      complaints = await db.complaints.getAllComplaints();
+      for (const departmentCode of VALID_DEPARTMENTS) {
+        const departmentComplaints = await complaintDb.getComplaintsByDepartment(departmentCode);
+        complaints.push(
+          ...departmentComplaints.map((complaint) => attachCategory(complaint, departmentCode))
+        );
+      }
     }
 
     return NextResponse.json({ complaints }, { status: 200 });

@@ -270,6 +270,8 @@ export const complaintDb = {
         user_id: complaint.user_id || '',
         contact_email: complaint.contact_email?.trim() || '',
         contact_phone: complaint.contact_phone?.trim() || '',
+        reported_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
       })
       .select()
       .single();

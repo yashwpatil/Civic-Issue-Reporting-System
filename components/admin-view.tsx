@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Complaint } from '@/lib/db';
-import type { User } from '@/lib/db';
+import type { Complaint, User } from '@/lib/db-supabase';
 import { ComplaintCard } from '@/components/complaint-card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -64,13 +63,9 @@ export function AdminView() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (categoryFilter !== 'all') params.append('category', categoryFilter);
-      if (statusFilter !== 'all') params.append('status', statusFilter);
-
       const [complaintsRes, statsRes, usersRes] = await Promise.all([
-        fetch(`/api/complaints?${params.toString()}`),
-        fetch('/api/stats'),
+        fetch('/api/complaints-supabase'),
+        fetch('/api/stats-supabase'),
         fetch('/api/users'),
       ]);
 
@@ -78,7 +73,14 @@ export function AdminView() {
       const statsData = await statsRes.json();
       const usersData = await usersRes.json();
 
-      setComplaints(complaintsData);
+      const complaintsList = complaintsData.complaints || [];
+      const filteredComplaints = complaintsList.filter((complaint: Complaint) => {
+        const categoryMatches = categoryFilter === 'all' || complaint.category === categoryFilter;
+        const statusMatches = statusFilter === 'all' || complaint.status === statusFilter;
+        return categoryMatches && statusMatches;
+      });
+
+      setComplaints(filteredComplaints);
       setStats(statsData);
       setUsers(usersData.users || []);
       setUserStats(usersData.stats || null);
@@ -96,7 +98,7 @@ export function AdminView() {
 
   const handleStatusChange = async (id: string, status: Complaint['status']) => {
     try {
-      const response = await fetch(`/api/complaints/${id}`, {
+      const response = await fetch(`/api/complaints-supabase/complaint/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
@@ -112,7 +114,7 @@ export function AdminView() {
       );
 
       // Update stats
-      const statsRes = await fetch('/api/stats');
+      const statsRes = await fetch('/api/stats-supabase');
       if (statsRes.ok) {
         const statsData = await statsRes.json();
         setStats(statsData);
@@ -135,7 +137,7 @@ export function AdminView() {
   const handleDelete = (id: string) => {
     setComplaints((prev) => prev.filter((c) => c.id !== id));
     // Refresh stats after delete
-    fetch('/api/stats')
+    fetch('/api/stats-supabase')
       .then((res) => res.ok && res.json())
       .then((statsData) => statsData && setStats(statsData))
       .catch(console.error);
@@ -259,7 +261,7 @@ export function AdminView() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              {Object.entries(stats.byCategory).map(([category, count]) => (
+              {Object.entries(stats.byCategory || {}).map(([category, count]) => (
                 <div key={category} className="text-center">
                   <div className="text-2xl font-bold text-primary mb-1">{count}</div>
                   <div className="text-sm text-foreground/70">
@@ -435,7 +437,7 @@ export function AdminView() {
                         </span>
                       </td>
                       <td className="py-3 px-4 text-foreground/70 text-sm">
-                        {new Date(user.createdAt).toLocaleDateString()}
+                        {new Date(user.created_at || user.createdAt || '').toLocaleDateString()}
                       </td>
                       <td className="py-3 px-4">
                         <Button

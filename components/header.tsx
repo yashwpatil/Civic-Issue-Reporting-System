@@ -55,7 +55,7 @@ export function Header() {
                 size="sm" 
                 variant="outline"
                 onClick={handleLogout}
-                className="transition-all duration-300 hover:bg-destructive hover:text-destructive-foreground"
+                className="transition-all duration-300 text-foreground hover:bg-destructive hover:text-white border-destructive/30 hover:border-destructive"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout

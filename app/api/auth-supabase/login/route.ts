@@ -33,7 +33,28 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate user credentials
-    const user = await userDb.validateUser(trimmedEmail, trimmedPassword);
+    let user = await userDb.validateUser(trimmedEmail, trimmedPassword);
+
+    // Create the admin account on demand if it does not exist yet
+    const defaultAdminEmail = 'admin@civichub.com';
+    const defaultAdminPassword = 'Admin@123';
+
+    if (
+      !user &&
+      type === 'admin' &&
+      trimmedEmail === defaultAdminEmail &&
+      trimmedPassword === defaultAdminPassword
+    ) {
+      const existingAdmin = await userDb.getUserByEmail(trimmedEmail);
+      if (!existingAdmin) {
+        user = await userDb.createUser(
+          trimmedEmail,
+          'Admin User',
+          trimmedPassword,
+          'admin'
+        );
+      }
+    }
 
     if (!user) {
       return NextResponse.json(
@@ -60,9 +81,16 @@ export async function POST(request: NextRequest) {
     }
 
     // For admin type, validate admin code if provided
-    if (type === 'admin' && adminCode) {
-      const validAdminCode = 'admin123';
-      if (adminCode !== validAdminCode) {
+    if (type === 'admin') {
+      if (!adminCode || typeof adminCode !== 'string' || !adminCode.trim()) {
+        return NextResponse.json(
+          { error: 'Admin code is required' },
+          { status: 400 }
+        );
+      }
+
+      const validAdminCode = 'ADMIN2024';
+      if (adminCode.trim() !== validAdminCode) {
         return NextResponse.json(
           { error: 'Invalid admin code' },
           { status: 401 }
